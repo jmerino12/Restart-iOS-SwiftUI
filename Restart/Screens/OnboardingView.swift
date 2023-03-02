@@ -16,6 +16,8 @@ struct OnboardingView: View {
     @State private var imageOfsset: CGSize = .zero
     @State private var indicatorOpacity: Double = 1.0
     @State private var textTitle: String = "Share."
+    
+    let hapticFeedback = UINotificationFeedbackGenerator()
     // MARK: - BODY
     
     var body: some View {
@@ -69,6 +71,7 @@ struct OnboardingView: View {
                             DragGesture()
                                 .onChanged { gesture in
                                     if abs(imageOfsset.width) <= 150 {
+                                        hapticFeedback.notificationOccurred(.success)
                                         imageOfsset = gesture.translation
                                         withAnimation(.linear(duration: 0.25)) {
                                             indicatorOpacity =  0
@@ -79,6 +82,7 @@ struct OnboardingView: View {
                                 .onEnded { _ in
                                     imageOfsset = .zero
                                     withAnimation(.linear(duration: 0.25)) {
+                                        hapticFeedback.notificationOccurred(.warning)
                                         indicatorOpacity = 1
                                         textTitle = "Share."
                                     }
@@ -143,7 +147,8 @@ struct OnboardingView: View {
                                 }
                             }
                             .onEnded { _ in
-                                if buttonOffset > buttonWidth / 2{
+                                if buttonOffset > buttonWidth / 2 {
+                                    playSound(sound: "chimeup", type: "mp3")
                                     buttonOffset = buttonWidth - 80
                                     isOnboardingViewActive = false
                                 }else {
@@ -165,7 +170,7 @@ struct OnboardingView: View {
         }//: ZSTACK
         .onAppear {
             isAnimating = true
-        }
+        }.preferredColorScheme(.dark)
     }
 }
 
